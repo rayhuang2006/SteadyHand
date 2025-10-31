@@ -1,0 +1,12 @@
+{
+  "start_pos": [50, 150],
+  "goal": {"x": 750, "y": 430, "width": 20, "height": 40},
+  "walls": [
+    {"x": 20, "y": 100, "width": 400, "height": 20},
+    {"x": 20, "y": 180, "width": 300, "height": 20},
+    {"x": 300, "y": 180, "width": 20, "height": 300},
+    {"x": 400, "y": 100, "width": 20, "height": 300},
+    {"x": 300, "y": 460, "width": 500, "height": 20},
+    {"x": 400, "y": 380, "width": 400, "height": 20}
+  ]
+}

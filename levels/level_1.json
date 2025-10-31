@@ -1,0 +1,8 @@
+{
+  "start_pos": [50, 300],
+  "goal": {"x": 750, "y": 280, "width": 20, "height": 40},
+  "walls": [
+    {"x": 0, "y": 250, "width": 800, "height": 20},
+    {"x": 0, "y": 330, "width": 800, "height": 20}
+  ]
+}
