@@ -1,0 +1,14 @@
+{
+  "start_pos": [50, 100],
+  "goal": {"x": 750, "y": 500, "width": 20, "height": 40},
+  "walls": [
+    {"x": 0, "y": 80, "width": 800, "height": 20},
+    {"x": 0, "y": 120, "width": 400, "height": 20},
+    {"x": 480, "y": 120, "width": 320, "height": 20},
+    {"x": 100, "y": 200, "width": 600, "height": 20, "move_axis": "x", "move_dist": 50, "move_speed": 2},
+    {"x": 100, "y": 280, "width": 20, "height": 200},
+    {"x": 200, "y": 280, "width": 500, "height": 20},
+    {"x": 680, "y": 280, "width": 20, "height": 200},
+    {"x": 200, "y": 460, "width": 500, "height": 20}
+  ]
+}
