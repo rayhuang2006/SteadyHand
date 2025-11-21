@@ -8,7 +8,7 @@
     {"x": 100, "y": 420, "width": 620, "height": 20, "move_axis": "x", "move_dist": 50, "move_speed": 3},
     {"x": 100, "y": 320, "width": 20, "height": 100, "move_axis": "y", "move_dist": 50, "move_speed": -3},
     {"x": 100, "y": 320, "width": 700, "height": 20},
-    {"x": 780, "y": 220, "width": 20, "height": 100},
+    {"x": 780, "y": 120, "width": 20, "height": 50},
     {"x": 0, "y": 220, "width": 780, "height": 20},
     {"x": 0, "y": 80, "width": 20, "height": 140},
     {"x": 0, "y": 80, "width": 700, "height": 20}
