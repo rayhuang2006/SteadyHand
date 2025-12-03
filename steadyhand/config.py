@@ -1,35 +1,43 @@
-from enum import Enum
+# 檔案名稱: steadyhand/config.py
 
-# --- 螢幕設定 ---
+# --- 視窗設定 ---
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-# --- 遊戲狀態 ---
-class GameState(Enum):
-    MENU = 0
-    PLAYING = 1
-    LEVEL_CLEAR = 2
-    GAME_OVER = 3
-    GAME_WIN = 4
+# --- 現代幾何配色 (無圖片) ---
+COLOR_BG = (10, 12, 20)       # 深邃背景
+COLOR_GRID = (30, 35, 50)     # 網格線
 
-# --- 顏色 (R, G, B) ---
-COLOR_BACKGROUND = (20, 20, 40)
-COLOR_TEXT = (255, 255, 255)
-COLOR_TEXT_DIM = (150, 150, 150)
-COLOR_TEXT_WIN = (0, 255, 0)
-COLOR_TEXT_LOSE = (255, 0, 0)
+# 實體顏色
+COLOR_WALL_BODY = (40, 45, 60)
+COLOR_WALL_BORDER = (200, 220, 255)
+COLOR_WALL_SHADOW = (5, 5, 10)
+COLOR_PLAYER_CORE = (0, 255, 255)
+COLOR_PLAYER_TRAIL = (0, 100, 100)
+COLOR_GOAL = (50, 255, 100)
 
-COLOR_PLAYER = (0, 255, 255) # 改成青色霓虹感
-COLOR_WALL = (100, 100, 120)
-COLOR_GOAL = (50, 255, 50)
+# UI 配色
+COLOR_UI_NORMAL = (150, 160, 180)
+COLOR_UI_HOVER = (0, 255, 255)
+COLOR_UI_BORDER_HOVER = (100, 255, 255)
+COLOR_UI_LOCKED_BG = (20, 25, 35)
+COLOR_UI_LOCKED_FG = (60, 70, 90)
 
-# --- 資源路徑 ---
-FONT_PATH = "assets/fonts/Roboto-Regular.ttf"
+# 特效配色
+COLOR_TRANSITION = (15, 20, 30)
+COLOR_PAUSE_BG = (0, 0, 0)
+COLOR_PARTICLE_SPARK = (255, 255, 100)
+COLOR_PARTICLE_TRAIL = (0, 200, 255)
+COLOR_STAR_ON = (255, 215, 0)
+COLOR_STAR_OFF = (60, 60, 80)
 
-# --- 遊戲設定 ---
-PLAYER_SIZE = 16  # 稍微大一點點
+# --- 資源 ---
+FONT_PATH = "assets/fonts/blueprint.ttf"
 
-# --- [新增] 物理參數 ---
-PLAYER_ACCEL = 0.8     # 加速度 (按鍵時的速度增加量)
-PLAYER_FRICTION = 0.90 # 摩擦力 (0.9 代表每幀速度衰減 10%)
-PLAYER_MAX_SPEED = 5.0 # 最大速度限制
+# --- 遊戲參數 ---
+PLAYER_SIZE = 14
+PLAYER_ACCEL = 0.8
+PLAYER_FRICTION = 0.90
+PLAYER_MAX_SPEED = 5.0
+STAR_3_TIME = 15.0
+STAR_2_TIME = 30.0

@@ -1,157 +1,96 @@
 # 檔案名稱: steadyhand/game.py
 import cpygfx
-from cpygfx.keys import KEY_ENTER # 我們用 ENTER 鍵來確認選單
-from .config import (
-    GameState, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH,
-    COLOR_BACKGROUND, COLOR_TEXT, COLOR_TEXT_DIM, 
-    COLOR_TEXT_WIN, COLOR_TEXT_LOSE
-)
-from .entities import Player
-from .level_manager import LevelManager
-from .utils import check_collision
+from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID
+from .scenes.menu import MenuScene
 
 class Game:
     def __init__(self):
-        self.level_manager = LevelManager("levels")
-        self.state = GameState.MENU
+        # [修正] 移除所有圖片載入邏輯
+        # 只保留字型載入
+        if not cpygfx.load_font(FONT_PATH, 24):
+            print("Warning: Font loading failed.")
+            
+        self.running = True
         
-        # 玩家初始位置會由 load_level 覆蓋
-        self.player = Player(0, 0, 16) 
-        self.walls = []
-        self.goal = None
-        self.current_level_index = 0
+        # 場景管理
+        self.current_scene = MenuScene(self)
+        self.next_scene_buffer = None 
         
-        if not cpygfx.load_font(FONT_PATH, 32):
-             print(f"警告：載入字型 {FONT_PATH}失敗")
-        print("遊戲物件初始化完成。")
-
-    def load_level(self, level_index: int):
-        level_data = self.level_manager.load_level_data(level_index)
+        # 轉場狀態
+        self.transition_state = 'NONE'
+        self.transition_width = 0 
+        self.max_trans_width = (SCREEN_WIDTH // 2) + 10
+        self.trans_speed = 12 
+        self.hold_ticks = 0
+        self.hold_duration = 30 
         
-        if level_data is None:
-            print(f"關卡 {level_index} 載入失敗，回到選單。")
-            self.state = GameState.MENU
-            return
+        print("Engine initialized: Geometry Mode (No Images).")
 
-        self.walls = level_data["walls"]
-        self.goal = level_data["goal"]
-        # 設定玩家起始位置 (同時會重置速度為 0)
-        self.player.set_pos(level_data["start_pos"][0], level_data["start_pos"][1])
-        self.current_level_index = level_index
-        self.state = GameState.PLAYING
+    def switch_scene(self, new_scene):
+        if self.transition_state == 'NONE':
+            self.next_scene_buffer = new_scene
+            self.transition_state = 'CLOSING'
 
-    def run(self):
-        print("開始遊戲主迴圈 (WASD 控制版)...")
-        running = True
-        while running:
-            # FPS 鎖定
-            cpygfx.delay(16) 
-
-            # 1. 處理系統事件 (如關閉視窗)
-            if cpygfx.poll_event():
-                running = False
-            
-            # 我們不再需要每幀讀取滑鼠，改在 update 裡讀鍵盤
-            
-            # 2. 更新遊戲邏輯
-            self.update()
-            
-            # 3. 渲染
-            self.render()
-            
-            # 4. 更新螢幕
-            cpygfx.update()
-            
-    def update(self):
-        """ 根據遊戲狀態更新邏輯 """
-        
-        # 取得一些通用輸入
-        clicked = cpygfx.get_mouse_clicked()
-        enter_pressed = cpygfx.is_key_down(KEY_ENTER) # 支援鍵盤確認
-        
-        if self.state == GameState.PLAYING:
-            # --- [核心修改] 玩家物理更新 ---
-            self.player.update()
-            # ---------------------------
-            
-            # 牆壁移動
-            for wall in self.walls:
-                wall.update()
-            
-            player_rect = self.player.rect
-            
-            # 撞牆檢查
-            for wall in self.walls:
-                if check_collision(player_rect, wall.rect):
-                    self.state = GameState.GAME_OVER
-                    return 
-            
-            # 終點檢查
-            if self.goal and check_collision(player_rect, self.goal.rect):
-                self.state = GameState.LEVEL_CLEAR
-                return
-
-        elif self.state == GameState.MENU:
-            if clicked or enter_pressed:
-                self.load_level(0) 
-
-        elif self.state == GameState.GAME_OVER:
-            if clicked or enter_pressed:
-                self.load_level(self.current_level_index)
-
-        elif self.state == GameState.LEVEL_CLEAR:
-            if clicked or enter_pressed:
-                next_index = self.current_level_index + 1
-                if next_index >= self.level_manager.get_level_count():
-                    self.state = GameState.GAME_WIN
-                else:
-                    self.load_level(next_index)
-                # 簡單的防彈跳 (Debounce)，避免 ENTER 一次跳兩關
-                # 這裡只是暫時解法，正式專案通常會有 InputManager 處理 KeyUp
-                cpygfx.delay(200) 
+    def update_transition(self):
+        if self.transition_state == 'CLOSING':
+            self.transition_width += self.trans_speed
+            if self.transition_width >= self.max_trans_width:
+                self.transition_width = self.max_trans_width
+                if self.next_scene_buffer:
+                    self.current_scene = self.next_scene_buffer
+                    self.next_scene_buffer = None
+                self.transition_state = 'HOLD'
+                self.hold_ticks = self.hold_duration
                 
-        elif self.state == GameState.GAME_WIN:
-            if clicked or enter_pressed:
-                self.state = GameState.MENU
-                cpygfx.delay(200)
+        elif self.transition_state == 'HOLD':
+            self.hold_ticks -= 1
+            if self.hold_ticks <= 0:
+                self.transition_state = 'OPENING'
+                
+        elif self.transition_state == 'OPENING':
+            self.transition_width -= self.trans_speed
+            if self.transition_width <= 0:
+                self.transition_width = 0
+                self.transition_state = 'NONE'
 
-    def render(self):
-        # (渲染邏輯保持不變，會直接畫出更新後的玩家位置)
-        c = COLOR_BACKGROUND
+    def render_transition(self):
+        if self.transition_state != 'NONE':
+            w = int(self.transition_width)
+            h = SCREEN_HEIGHT
+            c = COLOR_TRANSITION
+            cpygfx.draw_rect_filled(0, 0, w, h, c[0], c[1], c[2])
+            cpygfx.draw_rect_filled(SCREEN_WIDTH - w, 0, w, h, c[0], c[1], c[2])
+            
+            line_c = (100, 100, 120)
+            cpygfx.draw_rect(w-2, 0, 2, h, line_c[0], line_c[1], line_c[2])
+            cpygfx.draw_rect(SCREEN_WIDTH - w, 0, 2, h, line_c[0], line_c[1], line_c[2])
+
+    def render_global_background(self):
+        """[新增] 全局幾何背景繪製"""
+        # 1. 清除底色
+        c = COLOR_BG
         cpygfx.clear(c[0], c[1], c[2])
         
-        if self.state == GameState.MENU:
-            c = COLOR_TEXT
-            cpygfx.draw_text("Cyber Circuit", 200, 200, 0, 255, 255) # 改標題
-            c = COLOR_TEXT_DIM
-            cpygfx.draw_text("WASD to Move / ENTER to Start", 180, 300, c[0], c[1], c[2])
+        # 2. 畫網格
+        gc = COLOR_GRID
+        for x in range(0, SCREEN_WIDTH, 40):
+            cpygfx.draw_line(x, 0, x, SCREEN_HEIGHT, gc[0], gc[1], gc[2])
+        for y in range(0, SCREEN_HEIGHT, 40):
+            cpygfx.draw_line(0, y, SCREEN_WIDTH, y, gc[0], gc[1], gc[2])
 
-        elif self.state == GameState.PLAYING:
-            self.render_level()
-
-        elif self.state == GameState.GAME_OVER:
-            self.render_level() 
-            c = COLOR_TEXT_LOSE
-            cpygfx.draw_text("CIRCUIT BROKEN", 250, 250, c[0], c[1], c[2]) # 改文字
-            c = COLOR_TEXT_DIM
-            cpygfx.draw_text("Press ENTER to Retry", 250, 300, c[0], c[1], c[2])
-
-        elif self.state == GameState.LEVEL_CLEAR:
-            self.render_level() 
-            c = COLOR_TEXT_WIN
-            cpygfx.draw_text("SYNC COMPLETE", 250, 250, c[0], c[1], c[2]) # 改文字
-            c = COLOR_TEXT_DIM
-            cpygfx.draw_text("Press ENTER for Next Node", 200, 300, c[0], c[1], c[2])
+    def run(self):
+        while self.running:
+            cpygfx.delay(16)
+            if cpygfx.poll_event():
+                self.running = False
+                
+            self.current_scene.update()
+            self.update_transition()
             
-        elif self.state == GameState.GAME_WIN:
-            c = COLOR_TEXT_WIN
-            cpygfx.draw_text("SYSTEM RESTORED", 250, 250, c[0], c[1], c[2])
-            c = COLOR_TEXT_DIM
-            cpygfx.draw_text("Press ENTER to Reboot", 220, 300, c[0], c[1], c[2])
-
-    def render_level(self):
-        for wall in self.walls:
-            wall.draw()
-        if self.goal:
-            self.goal.draw()
-        self.player.draw()
+            # [修正] 統一繪製背景，不再依賴 assets['bg']
+            self.render_global_background()
+            
+            self.current_scene.render()
+            self.render_transition()
+            
+            cpygfx.update()
