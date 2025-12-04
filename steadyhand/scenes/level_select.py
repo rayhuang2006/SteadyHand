@@ -1,5 +1,4 @@
 # 檔案名稱: steadyhand/scenes/level_select.py
-# ... (前段 imports, __init__, update 等不變) ...
 from ..scene import Scene
 from ..config import *
 from ..level_manager import LevelManager
@@ -7,7 +6,6 @@ import cpygfx
 from cpygfx.keys import KEY_ESCAPE, KEY_W, KEY_S, KEY_UP, KEY_DOWN
 
 class LevelSelectScene(Scene):
-    # ... (__init__, init_buttons, update, draw_thumbnail, draw_stars, draw_dynamic_background 保持不變) ...
     def __init__(self, game):
         super().__init__(game)
         self.level_manager = LevelManager("levels")
@@ -22,9 +20,11 @@ class LevelSelectScene(Scene):
         self.back_btn_rect = (20, 20, 100, 40)
         self.init_buttons()
 
+    # ... (init_buttons, update, draw_thumbnail, draw_stars 保持不變) ...
     def init_buttons(self):
         real_levels = self.level_manager.get_level_count()
         total_display = max(20, real_levels) 
+        
         grid_width = self.cols * self.btn_size + (self.cols - 1) * self.btn_gap
         start_x = (SCREEN_WIDTH - grid_width) // 2
         
@@ -45,10 +45,10 @@ class LevelSelectScene(Scene):
             })
         total_rows = (total_display + self.cols - 1) // self.cols
         content_height = total_rows * (self.btn_size + self.btn_gap)
-        visible_height = SCREEN_HEIGHT - self.start_y - 20
-        self.max_scroll = max(0, content_height - visible_height)
+        self.max_scroll = max(0, content_height - (SCREEN_HEIGHT - self.start_y - 20))
 
     def update(self):
+        super().update()
         self.anim_ticks += 1
         scroll_speed = 15
         if cpygfx.is_key_down(KEY_W) or cpygfx.is_key_down(KEY_UP): self.scroll_y -= scroll_speed
@@ -104,25 +104,66 @@ class LevelSelectScene(Scene):
             sx = x + i * 15
             cpygfx.draw_rect_filled(sx, y, 8, 8, c[0], c[1], c[2])
 
-    def draw_dynamic_background(self):
-        grid_size = 40
-        scroll_x = int(self.anim_ticks * -0.3) % grid_size
-        scroll_y = int(self.anim_ticks * -0.3) % grid_size
-        c = COLOR_GRID
-        for x in range(-grid_size, SCREEN_WIDTH, grid_size):
-            draw_x = x + scroll_x
-            cpygfx.draw_line(draw_x, 0, draw_x, SCREEN_HEIGHT, c[0], c[1], c[2])
-        for y in range(-grid_size, SCREEN_HEIGHT, grid_size):
-            draw_y = y + scroll_y
-            cpygfx.draw_line(0, draw_y, SCREEN_WIDTH, draw_y, c[0], c[1], c[2])
+    def draw_leaderboard_panel(self, level_idx, x, y):
+        """[修正] 優化版排行榜面板"""
+        db_lvl = level_idx + 1
+        data = self.game.net.get_cached_leaderboard(db_lvl)
+        
+        if not data and not self.game.net.is_loading:
+            self.game.net.fetch_leaderboard_async(db_lvl)
+            
+        # [修正 1] 加高面板高度到 180 (原本 160)
+        w, h = 280, 180
+        if x + w > SCREEN_WIDTH: x -= (w + 120)
+            
+        cpygfx.draw_rect_filled(x, y, w, h, 20, 25, 30)
+        cpygfx.draw_rect(x, y, w, h, 0, 255, 255)
+        
+        title = f"TOP RECORDS (L-{db_lvl})"
+        tw = cpygfx.get_text_width(title)
+        tx = x + (w - tw) // 2
+        cpygfx.draw_text(title, tx, y + 10, 255, 255, 255)
+        
+        if not data:
+            load_txt = "LOADING..."
+            lw = cpygfx.get_text_width(load_txt)
+            lx = x + (w - lw) // 2
+            cpygfx.draw_text(load_txt, lx, y + 70, 150, 150, 150)
+        else:
+            rank_x = x + 15
+            name_x = x + 40
+            time_end_x = x + w - 15 
+            
+            for i, row in enumerate(data[:5]):
+                y_pos = y + 45 + i * 22
+                name = row['name']
+                time_str = f"{row['time']}s"
+                
+                colors = [(255,215,0), (192,192,192), (205,127,50)]
+                c = colors[i] if i < 3 else (150,150,150)
+                
+                cpygfx.draw_text(f"{i+1}.", rank_x, y_pos, c[0], c[1], c[2])
+                
+                # [修正 2] 放寬截斷限制到 13 個字元
+                # "Player-351e..." -> 13 char
+                display_name = name
+                if len(name) > 13:
+                    display_name = name[:12] + "." 
+                
+                cpygfx.draw_text(display_name, name_x, y_pos, 255, 255, 255)
+                
+                tw = cpygfx.get_text_width(time_str)
+                tx = time_end_x - tw
+                cpygfx.draw_text(time_str, tx, y_pos, 0, 255, 255)
 
     def render(self):
-        self.draw_dynamic_background()
+        c = COLOR_GRID
+        for x in range(0, SCREEN_WIDTH, 40): cpygfx.draw_line(x, 0, x, SCREEN_HEIGHT, *c)
+        for y in range(0, SCREEN_HEIGHT, 40): cpygfx.draw_line(0, y, SCREEN_WIDTH, y, *c)
         
         cpygfx.draw_rect_filled(0, 0, SCREEN_WIDTH, 100, 10, 12, 20)
         cpygfx.draw_line(0, 100, SCREEN_WIDTH, 100, 50, 60, 80)
         
-        # 標題置中
         title = "SELECT MODULE"
         tw = cpygfx.get_text_width(title)
         tx = (SCREEN_WIDTH - tw) // 2
@@ -131,13 +172,12 @@ class LevelSelectScene(Scene):
         mx, my = cpygfx.get_mouse_x(), cpygfx.get_mouse_y()
         bbx, bby, bbw, bbh = self.back_btn_rect
         b_hover = (bbx <= mx <= bbx+bbw and bby <= my <= bby+bbh)
-        
-        # 返回按鈕文字置中
         back_txt = "< BACK"
+        
         bw_txt = cpygfx.get_text_width(back_txt)
         bh_txt = cpygfx.get_text_height(back_txt)
         btx = bbx + (bbw - bw_txt)//2
-        bty = bby + (bbh - bh_txt)//2
+        bty = bby + (bbh - bh_txt)//2 + 2
         
         if b_hover:
             cpygfx.draw_rect(bbx, bby, bbw, bbh, 0, 255, 255)
@@ -146,6 +186,8 @@ class LevelSelectScene(Scene):
             cpygfx.draw_rect(bbx, bby, bbw, bbh, 100, 100, 100)
             cpygfx.draw_text(back_txt, btx, bty, 150, 150, 150)
 
+        active_tooltip = None 
+        
         for btn in self.buttons:
             bx, by, bw, bh = btn["base_rect"]
             screen_y = by - self.scroll_y
@@ -161,6 +203,7 @@ class LevelSelectScene(Scene):
             else:
                 hover = (bx <= mx <= bx+bw and screen_y <= my <= screen_y+bh)
                 border_c = COLOR_UI_BORDER_HOVER if hover else COLOR_UI_NORMAL
+                
                 cpygfx.draw_rect_filled(bx, screen_y, bw, bh, 30, 35, 50)
                 cpygfx.draw_rect(bx, screen_y, bw, bh, border_c[0], border_c[1], border_c[2])
                 
@@ -170,8 +213,13 @@ class LevelSelectScene(Scene):
                         self.draw_stars(bx + 10, screen_y + bh - 20, btn["record"]["stars"])
                     else:
                         cpygfx.draw_text("NEW", bx + 10, screen_y + bh - 30, 0, 255, 255)
-                
-                # 關卡數字置中 (右上角)
+                    
+                    if hover:
+                        active_tooltip = (btn["level_idx"], bx + 110, screen_y)
+                        
                 num_str = str(btn["level_idx"]+1)
                 num_w = cpygfx.get_text_width(num_str)
                 cpygfx.draw_text(num_str, bx + bw - num_w - 5, screen_y + 5, 200, 200, 200)
+
+        if active_tooltip:
+            self.draw_leaderboard_panel(*active_tooltip)

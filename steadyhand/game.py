@@ -1,22 +1,24 @@
 # 檔案名稱: steadyhand/game.py
 import cpygfx
-from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID
+# [修正] 匯入 SERVER_HOST, SERVER_PORT
+from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT
 from .scenes.menu import MenuScene
+from .network_client import NetworkClient
 
 class Game:
     def __init__(self):
-        # [修正] 移除所有圖片載入邏輯
-        # 只保留字型載入
         if not cpygfx.load_font(FONT_PATH, 24):
             print("Warning: Font loading failed.")
             
         self.running = True
         
-        # 場景管理
+        # [修正] 使用 Config 裡的設定，不再寫死 IP
+        print(f"[Game] Connecting to server at {SERVER_HOST}:{SERVER_PORT}...")
+        self.net = NetworkClient(host=SERVER_HOST, port=SERVER_PORT)
+        
         self.current_scene = MenuScene(self)
         self.next_scene_buffer = None 
         
-        # 轉場狀態
         self.transition_state = 'NONE'
         self.transition_width = 0 
         self.max_trans_width = (SCREEN_WIDTH // 2) + 10
@@ -24,7 +26,7 @@ class Game:
         self.hold_ticks = 0
         self.hold_duration = 30 
         
-        print("Engine initialized: Geometry Mode (No Images).")
+        print("Engine initialized: Geometry Mode + Network.")
 
     def switch_scene(self, new_scene):
         if self.transition_state == 'NONE':
@@ -60,18 +62,13 @@ class Game:
             c = COLOR_TRANSITION
             cpygfx.draw_rect_filled(0, 0, w, h, c[0], c[1], c[2])
             cpygfx.draw_rect_filled(SCREEN_WIDTH - w, 0, w, h, c[0], c[1], c[2])
-            
             line_c = (100, 100, 120)
             cpygfx.draw_rect(w-2, 0, 2, h, line_c[0], line_c[1], line_c[2])
             cpygfx.draw_rect(SCREEN_WIDTH - w, 0, 2, h, line_c[0], line_c[1], line_c[2])
 
     def render_global_background(self):
-        """[新增] 全局幾何背景繪製"""
-        # 1. 清除底色
         c = COLOR_BG
         cpygfx.clear(c[0], c[1], c[2])
-        
-        # 2. 畫網格
         gc = COLOR_GRID
         for x in range(0, SCREEN_WIDTH, 40):
             cpygfx.draw_line(x, 0, x, SCREEN_HEIGHT, gc[0], gc[1], gc[2])
@@ -83,14 +80,9 @@ class Game:
             cpygfx.delay(16)
             if cpygfx.poll_event():
                 self.running = False
-                
             self.current_scene.update()
             self.update_transition()
-            
-            # [修正] 統一繪製背景，不再依賴 assets['bg']
             self.render_global_background()
-            
             self.current_scene.render()
             self.render_transition()
-            
             cpygfx.update()

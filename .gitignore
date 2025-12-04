@@ -1,1 +1,14 @@
+# Python 暫存檔
 __pycache__/
+*.py[cod]
+
+# 虛擬環境
+.venv/
+venv/
+
+# 專案特定資料 (絕對不能上傳!)
+steadyhand.db       
+*.db  
+user_id.txt
+.env
+.DS_Store 

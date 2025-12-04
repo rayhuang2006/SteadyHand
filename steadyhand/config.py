@@ -1,12 +1,20 @@
 # 檔案名稱: steadyhand/config.py
+from .utils import load_env_file
+
+# [新增] 載入環境變數
+_env = load_env_file(".env")
+
+# [新增] 伺服器設定 (優先讀取 .env，讀不到則使用預設值)
+SERVER_HOST = _env.get("SERVER_HOST", "127.0.0.1")
+SERVER_PORT = int(_env.get("SERVER_PORT", "9999"))
 
 # --- 視窗設定 ---
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-# --- 現代幾何配色 (無圖片) ---
-COLOR_BG = (10, 12, 20)       # 深邃背景
-COLOR_GRID = (30, 35, 50)     # 網格線
+# --- 現代幾何配色 ---
+COLOR_BG = (10, 12, 20) 
+COLOR_GRID = (30, 35, 50)
 
 # 實體顏色
 COLOR_WALL_BODY = (40, 45, 60)
@@ -16,7 +24,7 @@ COLOR_PLAYER_CORE = (0, 255, 255)
 COLOR_PLAYER_TRAIL = (0, 100, 100)
 COLOR_GOAL = (50, 255, 100)
 
-# UI 配色
+# UI 互動配色
 COLOR_UI_NORMAL = (150, 160, 180)
 COLOR_UI_HOVER = (0, 255, 255)
 COLOR_UI_BORDER_HOVER = (100, 255, 255)

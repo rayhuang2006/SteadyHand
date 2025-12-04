@@ -3,8 +3,7 @@ from ..scene import Scene
 from ..config import *
 from ..entities import Player, Wall, Goal
 from ..level_manager import LevelManager
-# [修正] 移除 ParticleSystem 的匯入，因為 base scene 已經處理了
-from ..utils import check_collision, ScreenShaker 
+from ..utils import check_collision, ScreenShaker, ParticleSystem
 import cpygfx
 from cpygfx.keys import KEY_ESCAPE, KEY_ENTER, KEY_R
 
@@ -20,22 +19,17 @@ class GameplayScene(Scene):
         self.final_time = 0.0
         self.earned_stars = 0
         self.delay_timer = 0
-        # [修正] 移除 self.particles = ParticleSystem() (父類別已建立)
         self.shaker = ScreenShaker()
+        # self.particles 由父類別 Scene 處理
         
-        # [關鍵修正] 將暫停按鈕移到左上角
-        # 原本: (SCREEN_WIDTH - 60, 40, 40, 40)
-        # 改為: (左邊距 20, 頂邊距 40, 寬 40, 高 40)
+        # UI 佈局 (正確版)
         self.pause_btn_rect = (20, 40, 40, 40)
-        
-        # 按鈕位置 (保持不變，Y=200)
         self.overlay_btn_retry = (40, 200, 200, 50)
         self.overlay_btn_menu = (260, 200, 200, 50)
         self.overlay_btn_resume = (150, 200, 200, 50)
 
         self.load_level()
 
-    # ... (load_level, get_current_time, calculate_stars, trigger_pause, trigger_resume 保持不變) ...
     def load_level(self):
         data = self.level_manager.load_level_entities(self.level_index)
         if not data: return
@@ -64,8 +58,7 @@ class GameplayScene(Scene):
             self.start_ticks += paused_duration
 
     def update(self):
-        # [新增] 呼叫父類別的 update 以處理全域點擊特效
-        super().update()
+        super().update() # 處理全域粒子
         
         if cpygfx.is_key_down(KEY_ESCAPE):
             if self.state == "PLAYING": self.trigger_pause()
@@ -73,7 +66,6 @@ class GameplayScene(Scene):
             cpygfx.delay(200) 
 
         self.shaker.update()
-        # [修正] 移除 self.particles.update() (父類別已處理)
         
         mx, my = cpygfx.get_mouse_x(), cpygfx.get_mouse_y()
         clicked = cpygfx.get_mouse_clicked()
@@ -105,6 +97,14 @@ class GameplayScene(Scene):
                 self.final_time = (cpygfx.get_ticks() - self.start_ticks) / 1000.0
                 self.earned_stars = self.calculate_stars(self.final_time)
                 self.level_manager.save_record(self.level_index, self.final_time, self.earned_stars)
+                
+                # [新增] 上傳成績
+                self.game.net.upload_score_async(
+                    level=self.level_index + 1,
+                    time_spent=self.final_time,
+                    stars=self.earned_stars
+                )
+                
                 self.particles.emit(self.player.x, self.player.y, 30, (100, 255, 100), size=5, life=60)
                 return
 
@@ -142,11 +142,12 @@ class GameplayScene(Scene):
             if cpygfx.is_key_down(KEY_R) and self.state != "WIN":
                  self.load_level(); self.state = "PLAYING"; self.start_ticks = cpygfx.get_ticks()
 
-    # ... (draw_button, draw_interactive_overlay 保持不變，已完美置中) ...
     def draw_button(self, x, y, w, h, text, hover=False, highlight_color=COLOR_UI_HOVER):
         c = highlight_color if hover else COLOR_UI_NORMAL
         cpygfx.draw_rect_filled(x, y, w, h, 30, 35, 50)
         cpygfx.draw_rect(x, y, w, h, c[0], c[1], c[2])
+        
+        # [正確] 使用測量值
         tw = cpygfx.get_text_width(text)
         th = cpygfx.get_text_height(text)
         tx = x + (w - tw) // 2
@@ -155,27 +156,24 @@ class GameplayScene(Scene):
 
     def render(self):
         sx, sy = self.shaker.offset_x, self.shaker.offset_y
-        for x in range(0, SCREEN_WIDTH, 40): cpygfx.draw_line(x+sx, 0+sy, x+sx, SCREEN_HEIGHT+sy, *COLOR_GRID)
-        for y in range(0, SCREEN_HEIGHT, 40): cpygfx.draw_line(0+sx, y+sy, SCREEN_WIDTH+sx, y+sy, *COLOR_GRID)
+        # 背景由 Game 統一繪製
 
         for wall in self.walls: wall.draw()
         if self.goal: self.goal.draw()
         if self.state not in ["DYING", "DEAD", "WINNING", "WIN"]: self.player.draw()
         
-        # [修正] 移除 self.particles.draw() (父類別會統一在最後繪製)
+        # 移除 self.particles.draw()，改用 super().render()
         
         if self.state == "PLAYING":
             time_display = self.get_current_time()
             t_str = f"TIME: {time_display:.2f}"
             tw = cpygfx.get_text_width(t_str)
-            # 時間顯示在右側
             cpygfx.draw_text(t_str, SCREEN_WIDTH - tw - 20, 45, 255, 255, 255)
             
             mx, my = cpygfx.get_mouse_x(), cpygfx.get_mouse_y()
             pbx, pby, pbw, pbh = self.pause_btn_rect
             phover = (pbx <= mx <= pbx+pbw and pby <= my <= pby+pbh)
             c = COLOR_UI_HOVER if phover else COLOR_UI_NORMAL
-            # 繪製左上角的暫停按鈕
             cpygfx.draw_rect(pbx, pby, pbw, pbh, c[0], c[1], c[2])
             cpygfx.draw_rect_filled(pbx+12, pby+10, 6, 20, c[0], c[1], c[2])
             cpygfx.draw_rect_filled(pbx+22, pby+10, 6, 20, c[0], c[1], c[2])
@@ -188,8 +186,7 @@ class GameplayScene(Scene):
             cpygfx.draw_rect_filled(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
             self.draw_interactive_overlay("SYSTEM PAUSED", (255, 255, 0), is_pause_menu=True)
         
-        # [新增] 呼叫父類別 render 以繪製全域粒子
-        super().render()
+        super().render() # 畫粒子
 
     def draw_interactive_overlay(self, title, color, show_stars=False, is_pause_menu=False):
         w, h = 500, 300 
