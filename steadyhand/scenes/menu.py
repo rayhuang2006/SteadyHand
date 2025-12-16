@@ -4,6 +4,7 @@ from ..config import *
 # [修正] 移除 ParticleSystem 匯入
 import cpygfx
 from cpygfx.keys import KEY_ENTER
+from ..i18n import tr, _
 
 class MenuScene(Scene):
     def __init__(self, game):
@@ -57,11 +58,11 @@ class MenuScene(Scene):
         self.draw_dynamic_background()
         
         # 標題
-        t1 = "STEADY HAND"
+        t1 = tr("STEADY HAND")
         tw1 = cpygfx.get_text_width(t1)
         cpygfx.draw_text(t1, (SCREEN_WIDTH - tw1)//2, 150, 255, 255, 255)
         
-        t2 = "SYSTEM READY // AWAITING INPUT"
+        t2 = tr("SYSTEM READY // AWAITING INPUT")
         tw2 = cpygfx.get_text_width(t2)
         sub = COLOR_UI_NORMAL
         cpygfx.draw_text(t2, (SCREEN_WIDTH - tw2)//2, 220, sub[0], sub[1], sub[2])
@@ -73,12 +74,12 @@ class MenuScene(Scene):
         
         if hover:
             c = COLOR_UI_HOVER
-            text = "> INITIALIZE PROTOCOL <"
+            text = tr("> INITIALIZE PROTOCOL <")
             cpygfx.draw_rect_filled(bx, by, bw, bh, 20, 40, 50) 
             cpygfx.draw_rect(bx, by, bw, bh, c[0], c[1], c[2])
         else:
             c = COLOR_UI_NORMAL
-            text = "INITIALIZE PROTOCOL"
+            text = tr("INITIALIZE PROTOCOL")
 
         tw = cpygfx.get_text_width(text)
         th = cpygfx.get_text_height(text)

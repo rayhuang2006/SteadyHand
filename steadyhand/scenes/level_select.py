@@ -4,6 +4,7 @@ from ..config import *
 from ..level_manager import LevelManager
 import cpygfx
 from cpygfx.keys import KEY_ESCAPE, KEY_W, KEY_S, KEY_UP, KEY_DOWN
+from ..i18n import tr, _
 
 class LevelSelectScene(Scene):
     def __init__(self, game):
@@ -118,14 +119,15 @@ class LevelSelectScene(Scene):
             
         cpygfx.draw_rect_filled(x, y, w, h, 20, 25, 30)
         cpygfx.draw_rect(x, y, w, h, 0, 255, 255)
-        
-        title = f"TOP RECORDS (L-{db_lvl})"
+
+        title_str = _("TOP RECORDS") 
+        title = f"{title_str} (L-{db_lvl})"
         tw = cpygfx.get_text_width(title)
         tx = x + (w - tw) // 2
         cpygfx.draw_text(title, tx, y + 10, 255, 255, 255)
         
         if not data:
-            load_txt = "LOADING..."
+            load_txt = _("LOADING...")
             lw = cpygfx.get_text_width(load_txt)
             lx = x + (w - lw) // 2
             cpygfx.draw_text(load_txt, lx, y + 70, 150, 150, 150)
@@ -164,7 +166,7 @@ class LevelSelectScene(Scene):
         cpygfx.draw_rect_filled(0, 0, SCREEN_WIDTH, 100, 10, 12, 20)
         cpygfx.draw_line(0, 100, SCREEN_WIDTH, 100, 50, 60, 80)
         
-        title = "SELECT MODULE"
+        title = _("SELECT MODULE")
         tw = cpygfx.get_text_width(title)
         tx = (SCREEN_WIDTH - tw) // 2
         cpygfx.draw_text(title, tx, 40, 255, 255, 255)
@@ -172,7 +174,7 @@ class LevelSelectScene(Scene):
         mx, my = cpygfx.get_mouse_x(), cpygfx.get_mouse_y()
         bbx, bby, bbw, bbh = self.back_btn_rect
         b_hover = (bbx <= mx <= bbx+bbw and bby <= my <= bby+bbh)
-        back_txt = "< BACK"
+        back_txt = _("< BACK")
         
         bw_txt = cpygfx.get_text_width(back_txt)
         bh_txt = cpygfx.get_text_height(back_txt)
@@ -212,7 +214,7 @@ class LevelSelectScene(Scene):
                     if btn["record"]:
                         self.draw_stars(bx + 10, screen_y + bh - 20, btn["record"]["stars"])
                     else:
-                        cpygfx.draw_text("NEW", bx + 10, screen_y + bh - 30, 0, 255, 255)
+                        cpygfx.draw_text(_("NEW"), bx + 10, screen_y + bh - 30, 0, 255, 255)
                     
                     if hover:
                         active_tooltip = (btn["level_idx"], bx + 110, screen_y)

@@ -1,0 +1,53 @@
+#. menu.py
+msgid "STEADY HAND"
+msgstr "STEADY HAND"
+
+msgid "SYSTEM READY // AWAITING INPUT"
+msgstr "SYSTEM READY // AWAITING INPUT"
+
+msgid "INITIALIZE PROTOCOL"
+msgstr "INITIALIZE PROTOCOL"
+
+msgid "> INITIALIZE PROTOCOL <"
+msgstr "> INITIALIZE PROTOCOL <"
+
+#. level_select.py
+msgid "TOP RECORDS"
+msgstr "TOP RECORDS"
+
+msgid "LOADING..."
+msgstr "LOADING..."
+
+msgid "SELECT MODULE"
+msgstr "SELECT MODULE"
+
+msgid "< BACK"
+msgstr "< BACK"
+
+msgid "NEW"
+msgstr "NEW"
+
+#. gameplay.py
+msgid "RESUME GAME"
+msgstr "RESUME GAME"
+
+msgid "RETRY"
+msgstr "RETRY"
+
+msgid "MAIN MENU"
+msgstr "MAIN MENU"
+
+msgid "TIME"
+msgstr "TIME"
+
+msgid "CRITICAL FAILURE"
+msgstr "CRITICAL FAILURE"
+
+msgid "SEQUENCE COMPLETE"
+msgstr "SEQUENCE COMPLETE"
+
+msgid "SYSTEM PAUSED"
+msgstr "SYSTEM PAUSED"
+
+msgid "FINAL TIME"
+msgstr "FINAL TIME"

@@ -6,6 +6,7 @@ from ..level_manager import LevelManager
 from ..utils import check_collision, ScreenShaker, ParticleSystem
 import cpygfx
 from cpygfx.keys import KEY_ESCAPE, KEY_ENTER, KEY_R
+from ..i18n import tr, _
 
 class GameplayScene(Scene):
     def __init__(self, game, level_index):
@@ -166,7 +167,8 @@ class GameplayScene(Scene):
         
         if self.state == "PLAYING":
             time_display = self.get_current_time()
-            t_str = f"TIME: {time_display:.2f}"
+            time_str = _("TIME")
+            t_str = f"{time_str}: {time_display:.2f}"
             tw = cpygfx.get_text_width(t_str)
             cpygfx.draw_text(t_str, SCREEN_WIDTH - tw - 20, 45, 255, 255, 255)
             
@@ -179,12 +181,12 @@ class GameplayScene(Scene):
             cpygfx.draw_rect_filled(pbx+22, pby+10, 6, 20, c[0], c[1], c[2])
         
         if self.state == "DEAD":
-            self.draw_interactive_overlay("CRITICAL FAILURE", (255, 50, 50))
+            self.draw_interactive_overlay(_("CRITICAL FAILURE"), (255, 50, 50))
         elif self.state == "WIN":
-            self.draw_interactive_overlay("SEQUENCE COMPLETE", (50, 255, 50), show_stars=True)
+            self.draw_interactive_overlay(_("SEQUENCE COMPLETE"), (50, 255, 50), show_stars=True)
         elif self.state == "PAUSED":
             cpygfx.draw_rect_filled(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
-            self.draw_interactive_overlay("SYSTEM PAUSED", (255, 255, 0), is_pause_menu=True)
+            self.draw_interactive_overlay(_("SYSTEM PAUSED"), (255, 255, 0), is_pause_menu=True)
         
         super().render() # 畫粒子
 
@@ -211,8 +213,9 @@ class GameplayScene(Scene):
                 c_star = COLOR_STAR_ON if i < self.earned_stars else COLOR_STAR_OFF
                 cpygfx.draw_rect_filled(sx, content_y, 20, 20, c_star[0], c_star[1], c_star[2])
                 cpygfx.draw_rect(sx, content_y, 20, 20, 255, 255, 255)
-            
-            time_str = f"FINAL TIME: {self.final_time:.2f}s"
+           
+            final_time_str = _("FINAL TIME") 
+            time_str = f"{final_time_str}: {self.final_time:.2f}s"
             ttw = cpygfx.get_text_width(time_str)
             tx = x + (w - ttw)//2
             cpygfx.draw_text(time_str, tx, content_y + 50, 200, 200, 200)
@@ -220,12 +223,12 @@ class GameplayScene(Scene):
         if is_pause_menu:
             rbx, rby, rbw, rbh = self.overlay_btn_resume
             rhover = (x+rbx <= mx <= x+rbx+rbw and y+rby <= my <= y+rby+rbh)
-            self.draw_button(x+rbx, y+rby, rbw, rbh, "RESUME GAME", rhover)
+            self.draw_button(x+rbx, y+rby, rbw, rbh, _("RESUME GAME"), rhover)
         else:
             rbx, rby, rbw, rbh = self.overlay_btn_retry
             rhover = (x+rbx <= mx <= x+rbx+rbw and y+rby <= my <= y+rby+rbh)
-            self.draw_button(x+rbx, y+rby, rbw, rbh, "RETRY", rhover)
+            self.draw_button(x+rbx, y+rby, rbw, rbh, _("RETRY"), rhover)
             
             mbx, mby, mbw, mbh = self.overlay_btn_menu
             mhover = (x+mbx <= mx <= x+mbx+mbw and y+mby <= my <= y+mby+mbh)
-            self.draw_button(x+mbx, y+mby, mbw, mbh, "MAIN MENU", mhover)
+            self.draw_button(x+mbx, y+mby, mbw, mbh, _("MAIN MENU"), mhover)

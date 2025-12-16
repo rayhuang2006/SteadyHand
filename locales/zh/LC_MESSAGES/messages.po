@@ -1,0 +1,59 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. menu.py
+msgid "STEADY HAND"
+msgstr "神手大師"
+
+msgid "SYSTEM READY // AWAITING INPUT"
+msgstr "系統就緒 // 等待輸入"
+
+msgid "INITIALIZE PROTOCOL"
+msgstr "初始進入程序"
+
+msgid "> INITIALIZE PROTOCOL <"
+msgstr "> 初始進入程序 <"
+
+#. level_select.py
+msgid "TOP RECORDS"
+msgstr "最佳紀錄"
+
+msgid "LOADING..."
+msgstr "載入中..."
+
+msgid "SELECT MODULE"
+msgstr "選擇關卡"
+
+msgid "< BACK"
+msgstr "< 返回"
+
+msgid "NEW"
+msgstr "新關卡"
+
+#. gameplay.py
+msgid "RESUME GAME"
+msgstr "繼續遊戲"
+
+msgid "RETRY"
+msgstr "重試"
+
+msgid "MAIN MENU"
+msgstr "主選單"
+
+msgid "TIME"
+msgstr "時間"
+
+msgid "CRITICAL FAILURE"
+msgstr "闖關失敗"
+
+msgid "SEQUENCE COMPLETE"
+msgstr "闖關成功"
+
+msgid "SYSTEM PAUSED"
+msgstr "系統暫停"
+
+msgid "FINAL TIME"
+msgstr "耗費時間"
+

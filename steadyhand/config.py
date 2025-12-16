@@ -40,7 +40,10 @@ COLOR_STAR_ON = (255, 215, 0)
 COLOR_STAR_OFF = (60, 60, 80)
 
 # --- 資源 ---
-FONT_PATH = "assets/fonts/blueprint.ttf"
+FONT_PATH = "assets/fonts/NotoSansTC-Regular.ttf"
+
+# --- 語言 ---
+DEFAULT_LANG = "en" # en | zh
 
 # --- 遊戲參數 ---
 PLAYER_SIZE = 14
