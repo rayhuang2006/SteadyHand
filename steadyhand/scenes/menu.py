@@ -6,6 +6,40 @@ import cpygfx
 from cpygfx.keys import KEY_ENTER
 from ..i18n import tr, _
 
+# --- TRON UI helpers (menu only) ---------------------------------
+def _draw_neon_outline(x, y, w, h, color, base_w=2):
+    """用多次外擴描邊模擬霓虹 glow（不需要 alpha 支援）"""
+    glow = UI_GLOW if isinstance(UI_GLOW, dict) else {"enabled": False}
+    r, g, b = color
+
+    if not glow.get("enabled", False):
+        cpygfx.draw_rect(x, y, w, h, r, g, b)
+        return
+
+    passes = int(glow.get("passes", 3))
+    spread = int(glow.get("spread", 2))
+
+    # 外圈：由外往內畫（看起來像光暈）
+    for i in range(passes, 0, -1):
+        off = i * spread
+        cpygfx.draw_rect(x - off, y - off, w + off * 2, h + off * 2, r, g, b)
+
+    # 內圈：銳利邊
+    cpygfx.draw_rect(x, y, w, h, r, g, b)
+
+def _draw_button_skin(bx, by, bw, bh, hover):
+    """按鈕底色 + 邊框（由 config 主題控制）"""
+    fill = UI_BTN_FILL_HOVER if hover else UI_BTN_FILL
+    fr, fg, fb = fill
+
+    stroke = COLOR_UI_HOVER if hover else COLOR_UI_NORMAL
+    _draw_neon_outline(bx, by, bw, bh, stroke, base_w=UI_LINE_W)
+
+    # 底色放在框線之前或之後都可；這裡選先填底再畫框更像 UI
+    cpygfx.draw_rect_filled(bx, by, bw, bh, fr, fg, fb)
+    _draw_neon_outline(bx, by, bw, bh, stroke, base_w=UI_LINE_W)
+# ----------------------------------------------------------------
+
 class MenuScene(Scene):
     def __init__(self, game):
         super().__init__(game)
@@ -71,23 +105,19 @@ class MenuScene(Scene):
         mx, my = cpygfx.get_mouse_x(), cpygfx.get_mouse_y()
         bx, by, bw, bh = self.start_button_rect
         hover = (bx <= mx <= bx+bw and by <= my <= by+bh)
-        
-        if hover:
-            c = COLOR_UI_HOVER
-            text = tr("> INITIALIZE PROTOCOL <")
-            cpygfx.draw_rect_filled(bx, by, bw, bh, 20, 40, 50) 
-            cpygfx.draw_rect(bx, by, bw, bh, c[0], c[1], c[2])
-        else:
-            c = COLOR_UI_NORMAL
-            text = tr("INITIALIZE PROTOCOL")
+
+        # 由 Theme 控制底色/霓虹框
+        _draw_button_skin(bx, by, bw, bh, hover)
+
+        # 文字
+        c = COLOR_UI_HOVER if hover else COLOR_UI_NORMAL
+        text = tr("> INITIALIZE PROTOCOL <") if hover else tr("INITIALIZE PROTOCOL")
 
         tw = cpygfx.get_text_width(text)
         th = cpygfx.get_text_height(text)
-        
         tx = bx + (bw - tw) // 2
         ty = by + (bh - th) // 2
-        
         cpygfx.draw_text(text, tx, ty, c[0], c[1], c[2])
-        
+ 
         # [新增] 呼叫父類別 render 以繪製全域粒子
         super().render()

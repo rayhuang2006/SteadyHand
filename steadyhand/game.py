@@ -1,7 +1,7 @@
 # 檔案名稱: steadyhand/game.py
 import cpygfx
 # [修正] 匯入 SERVER_HOST, SERVER_PORT
-from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT, DEFAULT_LANG
+from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT, LANGUAGE
 from .scenes.menu import MenuScene
 from .network_client import NetworkClient
 from . import i18n
@@ -28,7 +28,7 @@ class Game:
         self.hold_duration = 30 
 
         # 設置語言
-        i18n.set_language(DEFAULT_LANG)
+        i18n.set_language(LANGUAGE)
         
         print("Engine initialized: Geometry Mode + Network.")
 
