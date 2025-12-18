@@ -1,7 +1,7 @@
 # 檔案名稱: steadyhand/game.py
 import cpygfx
 # [修正] 匯入 SERVER_HOST, SERVER_PORT
-from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT, LANGUAGE, ENABLE_AUDIO
+from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT, LANGUAGE, ENABLE_AUDIO, BG_PATH
 from .scenes.menu import MenuScene
 from .network_client import NetworkClient
 from . import i18n
@@ -76,6 +76,11 @@ class Game:
             cpygfx.draw_rect(SCREEN_WIDTH - w, 0, 2, h, line_c[0], line_c[1], line_c[2])
 
     def render_global_background(self):
+        if BG_PATH != "":
+            bg = cpygfx.load_image(BG_PATH)
+            cpygfx.draw_image(bg, 0, 0)
+            return
+
         c = COLOR_BG
         cpygfx.clear(c[0], c[1], c[2])
         gc = COLOR_GRID

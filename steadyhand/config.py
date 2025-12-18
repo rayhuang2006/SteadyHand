@@ -17,6 +17,7 @@ SCREEN_HEIGHT = 600
 _theme = THEMES.get(UI_STYLE, THEMES["classic"])
 
 # --- 現代幾何配色 ---
+BG_PATH = _theme["BG_PATH"]
 COLOR_BG = _theme["COLOR_BG"]
 COLOR_GRID = _theme["COLOR_GRID"]
 
@@ -76,6 +77,7 @@ STAR_2_TIME = 30.0
 def dump_config():
     configs = {
         "UI_STYLE": UI_STYLE,
+        "BG_PATH": BG_PATH,
         "LANGUAGE": LANGUAGE,
         "FONT_PATH": FONT_PATH,
         "ENABLE_AUDIO": ENABLE_AUDIO,
