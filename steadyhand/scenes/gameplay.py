@@ -70,6 +70,8 @@ class GameplayScene(Scene):
         
         mx, my = cpygfx.get_mouse_x(), cpygfx.get_mouse_y()
         clicked = cpygfx.get_mouse_clicked()
+        if clicked:
+            self.game.play_sound("assets/sounds/button_click.wav", 0)
 
         if self.state == "PLAYING":
             pbx, pby, pbw, pbh = self.pause_btn_rect
@@ -86,6 +88,7 @@ class GameplayScene(Scene):
             p_rect = self.player.rect
             for wall in self.walls:
                 if check_collision(p_rect, wall.rect):
+                    self.game.play_sound("assets/sounds/short_explosion.wav", 0)
                     self.state = "DYING"
                     self.delay_timer = 60 
                     self.shaker.trigger(15)
@@ -93,6 +96,7 @@ class GameplayScene(Scene):
                     return
             
             if self.goal and check_collision(p_rect, self.goal.rect):
+                self.game.play_sound("assets/sounds/short_explosion.wav", 0)
                 self.state = "WINNING"
                 self.delay_timer = 60
                 self.final_time = (cpygfx.get_ticks() - self.start_ticks) / 1000.0

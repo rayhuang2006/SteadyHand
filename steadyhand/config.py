@@ -55,6 +55,10 @@ UI_GLOW = _theme.get("UI_GLOW", {"enabled": False})
 # --- 語言 ---
 LANGUAGE = _env.get("LANGUAGE", "en")
 
+# --- 聲音 ---
+ENABLE_AUDIO = _env.get('ENABLE_AUDIO', 'true').lower() == 'true'
+
+
 # --- 資源 ---
 FONT_PATH = _theme["FONT_PATH"]
 if LANGUAGE == "zh": 
@@ -74,6 +78,7 @@ def dump_config():
         "UI_STYLE": UI_STYLE,
         "LANGUAGE": LANGUAGE,
         "FONT_PATH": FONT_PATH,
+        "ENABLE_AUDIO": ENABLE_AUDIO,
     }
 
     for key, value in configs.items():

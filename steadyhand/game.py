@@ -1,7 +1,7 @@
 # 檔案名稱: steadyhand/game.py
 import cpygfx
 # [修正] 匯入 SERVER_HOST, SERVER_PORT
-from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT, LANGUAGE
+from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT, LANGUAGE, ENABLE_AUDIO
 from .scenes.menu import MenuScene
 from .network_client import NetworkClient
 from . import i18n
@@ -29,10 +29,15 @@ class Game:
 
         # 設置語言
         i18n.set_language(LANGUAGE)
+
+        # 設置聲音
+        self.enable_audio = ENABLE_AUDIO
         
+        self.play_sound("assets/sounds/welcome.wav", 0)
         print("Engine initialized: Geometry Mode + Network.")
 
     def switch_scene(self, new_scene):
+        self.play_sound("assets/sounds/door_open.wav", 0)
         if self.transition_state == 'NONE':
             self.next_scene_buffer = new_scene
             self.transition_state = 'CLOSING'
@@ -90,3 +95,9 @@ class Game:
             self.current_scene.render()
             self.render_transition()
             cpygfx.update()
+
+    def play_sound(self, wav_path: str, loops: int = 0) -> bool:
+        if self.enable_audio:
+            return cpygfx.play_sound(wav_path, loops)
+        else:
+            return 0
