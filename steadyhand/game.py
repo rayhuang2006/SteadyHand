@@ -32,7 +32,13 @@ class Game:
 
         # 設置聲音
         self.enable_audio = ENABLE_AUDIO
-        
+
+        # 設置背景
+        if BG_PATH != "":
+            self.bg_path = cpygfx.load_image(BG_PATH)
+        else:
+            self.bg_path = None
+
         self.play_sound("assets/sounds/welcome.wav", 0)
         print("Engine initialized: Geometry Mode + Network.")
 
@@ -76,9 +82,8 @@ class Game:
             cpygfx.draw_rect(SCREEN_WIDTH - w, 0, 2, h, line_c[0], line_c[1], line_c[2])
 
     def render_global_background(self):
-        if BG_PATH != "":
-            bg = cpygfx.load_image(BG_PATH)
-            cpygfx.draw_image(bg, 0, 0)
+        if self.bg_path:
+            cpygfx.draw_image(self.bg_path, 0, 0)
             return
 
         c = COLOR_BG
