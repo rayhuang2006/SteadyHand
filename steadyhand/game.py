@@ -1,7 +1,7 @@
 # 檔案名稱: steadyhand/game.py
 import cpygfx
 # [修正] 匯入 SERVER_HOST, SERVER_PORT
-from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT, LANGUAGE, ENABLE_AUDIO, BG_PATH
+from .config import SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, COLOR_BG, COLOR_TRANSITION, COLOR_GRID, SERVER_HOST, SERVER_PORT, LANGUAGE, ENABLE_AUDIO, BG_PATH, LOGO_IMAGE
 from .scenes.menu import MenuScene
 from .network_client import NetworkClient
 from . import i18n
@@ -38,6 +38,13 @@ class Game:
             self.bg_path = cpygfx.load_image(BG_PATH)
         else:
             self.bg_path = None
+
+        if LOGO_IMAGE != "":
+            logo_path = "assets/images/" + LOGO_IMAGE + "_" +  LANGUAGE + ".png"
+            print(f"logo_path: {logo_path}")
+            self.logo_image = cpygfx.load_image(logo_path)
+        else:
+            self.logo_image = None
 
         self.play_sound("assets/sounds/welcome.wav", 0)
         print("Engine initialized: Geometry Mode + Network.")

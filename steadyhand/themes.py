@@ -8,6 +8,7 @@ THEMES = {
         "NAME": "Classic",
 
         "BG_PATH": "",
+        "LOGO_IMAGE": "",
         "COLOR_BG": (10, 12, 20),
         "COLOR_GRID": (30, 35, 50),
 
@@ -57,6 +58,7 @@ THEMES = {
         "NAME": "TRON Legacy",
 
         "BG_PATH": "assets/images/bg_red.png",
+        "LOGO_IMAGE": "logo_blue",              # assets/images/logo_blue_{LANG}.png
         "COLOR_BG": (3, 6, 12),
         "COLOR_GRID": (0, 28, 40),
 
@@ -108,6 +110,7 @@ THEMES = {
         "NAME": "TRON Neon Red",
 
         "BG_PATH": "assets/images/bg_blue.png",
+        "LOGO_IMAGE": "logo_red",              # assets/images/logo_red_{LANG}.png"
         "COLOR_BG": (6, 2, 8),                 # 更偏紫黑的深底，紅光更亮
         "COLOR_GRID": (40, 0, 18),
 

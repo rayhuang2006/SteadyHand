@@ -4,7 +4,7 @@ from .utils import load_env_file
 
 # [新增] 載入環境變數
 _env = load_env_file(".env")
-UI_STYLE = (_env.get("UI_STYLE", "classic") or "classic").strip().lower()
+UI_STYLE = (_env.get("UI_STYLE", "tron") or "tron").strip().lower()
 
 # [新增] 伺服器設定 (優先讀取 .env，讀不到則使用預設值)
 SERVER_HOST = _env.get("SERVER_HOST", "127.0.0.1")
@@ -18,6 +18,7 @@ _theme = THEMES.get(UI_STYLE, THEMES["classic"])
 
 # --- 現代幾何配色 ---
 BG_PATH = _theme["BG_PATH"]
+LOGO_IMAGE = _theme["LOGO_IMAGE"]
 COLOR_BG = _theme["COLOR_BG"]
 COLOR_GRID = _theme["COLOR_GRID"]
 

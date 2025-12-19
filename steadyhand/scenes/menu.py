@@ -92,9 +92,12 @@ class MenuScene(Scene):
         self.draw_dynamic_background()
         
         # 標題
-        t1 = tr("STEADY HAND")
-        tw1 = cpygfx.get_text_width(t1)
-        cpygfx.draw_text(t1, (SCREEN_WIDTH - tw1)//2, 150, 255, 255, 255)
+        if self.game.logo_image:
+            cpygfx.draw_image(self.game.logo_image, 154, 42)
+        else:
+            t1 = tr("STEADY HAND")
+            tw1 = cpygfx.get_text_width(t1)
+            cpygfx.draw_text(t1, (SCREEN_WIDTH - tw1)//2, 150, 255, 255, 255)
         
         t2 = tr("SYSTEM READY // AWAITING INPUT")
         tw2 = cpygfx.get_text_width(t2)
