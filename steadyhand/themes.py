@@ -15,6 +15,7 @@ THEMES = {
         "COLOR_WALL_BODY": (40, 45, 60),
         "COLOR_WALL_BORDER": (200, 220, 255),
         "COLOR_WALL_SHADOW": (5, 5, 10),
+        "TEXTURE_WALL_IMAGE": "assets/images/wall_tile_classic_20x20.png",
 
         "COLOR_PLAYER_CORE": (0, 255, 255),
         "COLOR_PLAYER_TRAIL": (0, 100, 100),
@@ -65,6 +66,7 @@ THEMES = {
         "COLOR_WALL_BODY": (7, 14, 26),
         "COLOR_WALL_BORDER": (0, 230, 255),
         "COLOR_WALL_SHADOW": (0, 0, 0),
+        "TEXTURE_WALL_IMAGE": "assets/images/wall_tile_blue_20x20.png",
 
         "COLOR_PLAYER_CORE": (0, 240, 255),
         "COLOR_PLAYER_TRAIL": (0, 120, 140),
@@ -117,6 +119,7 @@ THEMES = {
         "COLOR_WALL_BODY": (14, 6, 14),
         "COLOR_WALL_BORDER": (255, 40, 120),   # 霓虹紅（偏桃紅）
         "COLOR_WALL_SHADOW": (0, 0, 0),
+        "TEXTURE_WALL_IMAGE": "assets/images/wall_tile_red_20x20.png",
 
         "COLOR_PLAYER_CORE": (255, 70, 150),
         "COLOR_PLAYER_TRAIL": (120, 20, 70),

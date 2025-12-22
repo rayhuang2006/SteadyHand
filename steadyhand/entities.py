@@ -112,6 +112,12 @@ class Wall:
         self.move_dist = move_dist
         self.move_speed = move_speed
 
+        # 牆壁磚的材質
+        if TEXTURE_WALL_IMAGE != "":
+            self.wall_texture = cpygfx.load_image(TEXTURE_WALL_IMAGE)
+        else:
+            self.wall_texture = None
+
     def update(self):
         # 恢復移動邏輯
         if self.move_axis:
@@ -135,8 +141,20 @@ class Wall:
         # 2. 本體 (Body)
         bc = COLOR_WALL_BODY
         cpygfx.draw_rect_filled(x, y, w, h, bc[0], bc[1], bc[2])
-        
-        # 3. 邊框 (Border)
+
+        # 3. 牆壁材質貼圖 (牆壁磚)
+        # repeat draw to fill the rect
+        if self.wall_texture:
+            tile_w, tile_h = 20, 20
+            ty = y
+            while ty < y + h:
+                tx = x
+                while tx < x + w:
+                    cpygfx.draw_image(self.wall_texture, tx, ty)
+                    tx += tile_w
+                ty += tile_h
+
+        # 4. 邊框 (Border)
         lc = COLOR_WALL_BORDER
         cpygfx.draw_rect(x, y, w, h, lc[0], lc[1], lc[2])
 
